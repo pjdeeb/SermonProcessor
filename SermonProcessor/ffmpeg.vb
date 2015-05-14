@@ -9,13 +9,13 @@ Public Class ffmpeg
     End Sub
 
     Public Sub SplitFile(info As MediaInfo, tracklength As Integer, bitrate As String)
-        Dim prcs As New Process()
-        prcs.StartInfo.FileName = ffmpegpath
-        prcs.StartInfo.CreateNoWindow = True
-        prcs.StartInfo.UseShellExecute = False
-        prcs.StartInfo.RedirectStandardError = True
-        prcs.StartInfo.RedirectStandardOutput = True
-        prcs.EnableRaisingEvents = True
+        'Dim prcs As New Process()
+        'prcs.StartInfo.FileName = ffmpegpath
+        'prcs.StartInfo.CreateNoWindow = True
+        'prcs.StartInfo.UseShellExecute = False
+        'prcs.StartInfo.RedirectStandardError = True
+        'prcs.StartInfo.RedirectStandardOutput = True
+        'prcs.EnableRaisingEvents = True
 
         Dim args As String
         Dim n As Integer = Math.Floor(info.duration / tracklength)
@@ -30,16 +30,50 @@ Public Class ffmpeg
                 "-metadata genre=" & Quotes(info.genre) & " " & _
                 "-metadata track=" & i + 1 & " " & _
                 Quotes(Path.Combine(pathroot, newname))
-            prcs.StartInfo.Arguments = args
-            prcs.Start()
-            While Not prcs.HasExited
-                Trace.WriteLine(args)
-                Trace.WriteLine(prcs.StandardOutput.ReadToEnd())
-                Trace.WriteLine(prcs.StandardError.ReadToEnd())
-            End While
+
+            RunFFMpeg(args)
+            'prcs.StartInfo.Arguments = args
+            'prcs.Start()
+            'While Not prcs.HasExited
+            '    Trace.WriteLine(args)
+            '    Trace.WriteLine(prcs.StandardOutput.ReadToEnd())
+            '    Trace.WriteLine(prcs.StandardError.ReadToEnd())
+            'End While
         Next
 
     End Sub
+
+    Private Sub RunFFMpeg(args As String)
+        Trace.WriteLine(args)
+        Dim prcs As New Process()
+        prcs.StartInfo.FileName = ffmpegpath
+        'prcs.StartInfo.CreateNoWindow = True
+        'prcs.StartInfo.UseShellExecute = False
+        'prcs.StartInfo.RedirectStandardError = True
+        'prcs.StartInfo.RedirectStandardOutput = True
+        'prcs.EnableRaisingEvents = True
+
+        prcs.StartInfo.Arguments = args
+        prcs.Start()
+        'While Not prcs.HasExited
+        '    Trace.WriteLine(args)
+        '    Trace.WriteLine(prcs.StandardOutput.ReadToEnd())
+        '    Trace.WriteLine(prcs.StandardError.ReadToEnd())
+        'End While
+    End Sub
+
+    Public Function GetCoverArt(filepath As String) As Image
+        Dim args As String
+        Dim coverartpath As String = Path.Combine(My.Computer.FileSystem.SpecialDirectories.Temp, Path.GetFileNameWithoutExtension(filepath) & ".jpg")
+        args = "-y -i " & Quotes(filepath) & " " & Quotes(coverartpath)
+        RunFFMpeg(args)
+        Threading.Thread.Sleep(200)
+        If File.Exists(coverartpath) Then
+            Return Image.FromFile(coverartpath)
+        Else
+            Return Nothing
+        End If
+    End Function
 
     Public Function Quotes(input As String) As String
         Return Chr(34) & input & Chr(34)
@@ -131,6 +165,7 @@ Public Class MediaInfo
     Public height As Integer
     Public framerate As Double
     Public filepath As String
+    Public coverart As Image
 
     Public Sub New(_filepath As String)
         filepath = _filepath

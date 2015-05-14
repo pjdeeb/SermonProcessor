@@ -91,22 +91,31 @@ Public Class Form1
         Return input
     End Function
 
-    Private Sub OpenMediaFileToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles OpenMediaFileToolStripMenuItem.Click
+    Private Sub OpenFileBtn_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles OpenFileBtn.LinkClicked
         Dim ofd As New OpenFileDialog()
         If ofd.ShowDialog = Windows.Forms.DialogResult.OK Then
             info = probe.GetInfo(ofd.FileName)
-            TextBox1.Text = "Duration: " & info.duration & vbNewLine & _
-                "Bit Rate: " & info.bitrate & vbNewLine & _
-                "Title: " & info.title & vbNewLine & _
-                "Artist: " & info.artist & vbNewLine & _
-                "Album: " & info.album & vbNewLine & _
-                "Track: " & info.track & vbNewLine & _
-                "Genre: " & info.genre & vbNewLine & _
-                "Date: " & info.mediadate
+            durationTxt.Text = info.duration
+            bitrateTxt.Text = info.bitrate
+            titleTxt.Text = info.title
+            artistTxt.Text = info.artist
+            albumTxt.Text = info.album
+            genreTxt.Text = info.genre
+            dateTxt.Text = info.mediadate
+
+            PictureBox1.Image = converter.GetCoverArt(ofd.FileName)
+            'TextBox1.Text = "Duration: " & info.duration & vbNewLine & _
+            '    "Bit Rate: " & info.bitrate & vbNewLine & _
+            '    "Title: " & info.title & vbNewLine & _
+            '    "Artist: " & info.artist & vbNewLine & _
+            '    "Album: " & info.album & vbNewLine & _
+            '    "Track: " & info.track & vbNewLine & _
+            '    "Genre: " & info.genre & vbNewLine & _
+            '    "Date: " & info.mediadate
         End If
     End Sub
 
-    Private Sub SplitAudioIntoTracksToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles SplitAudioIntoTracksToolStripMenuItem.Click
+    Private Sub SplitAudioBtn_LinkClicked(sender As Object, e As LinkLabelLinkClickedEventArgs) Handles SplitAudioBtn.LinkClicked
         converter.SplitFile(info, trackLengthTxt.Text, bitrateCB.SelectedItem)
     End Sub
 
